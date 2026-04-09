@@ -84,9 +84,16 @@ public class PageWaitForLoadStateTests : PageTestEx
 
         var navigationTask = Page.GotoAsync(Server.Prefix + "/one-style.html");
         await waitForRequestTask;
-        await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
-        responseTask.TrySetResult(true);
-        await navigationTask;
+        try
+        {
+            await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+        }
+        finally
+        {
+            // Always release and await navigation to avoid unobserved task exceptions in teardown.
+            responseTask.TrySetResult(true);
+            await navigationTask;
+        }
     }
 
     [PlaywrightTest("page-wait-for-load-state.ts", "should work with pages that have loaded before being connected to")]

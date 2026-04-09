@@ -1,5 +1,6 @@
 name: Test Docker
 on:
+  workflow_dispatch:
   push:
     paths:
       - '.github/workflows/test_docker.yml'
