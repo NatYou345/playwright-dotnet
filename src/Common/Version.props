@@ -1,4 +1,5 @@
 <Project>
+  <!-- No-op change to trigger CI workflows -->
   <PropertyGroup>
     <AssemblyVersion>1.58.0</AssemblyVersion>
     <PackageVersion>$(AssemblyVersion)</PackageVersion>
