@@ -5,6 +5,8 @@ function workerFunction() {
 }
 
 self.addEventListener('message', event => {
+  if (event.origin && event.origin !== self.location.origin)
+    return;
   console.log('got this data: ' + event.data);
 });
 

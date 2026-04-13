@@ -168,7 +168,16 @@ public class SimpleServer
     {
         var pathName = context.Request.Path.ToString();
         var fileName = string.IsNullOrEmpty(pathName) ? "index.html" : pathName.Substring(1);
-        var filePath = Path.Combine(_contentRoot, fileName);
+        var filePath = Path.GetFullPath(Path.Combine(_contentRoot, fileName));
+        var contentRootFull = Path.GetFullPath(_contentRoot) + Path.DirectorySeparatorChar;
+
+        if (!filePath.StartsWith(contentRootFull, StringComparison.Ordinal))
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "text/plain";
+            await context.Response.WriteAsync("Bad request").ConfigureAwait(false);
+            return;
+        }
 
         context.Response.Headers["Cache-Control"] = "no-cache, no-store";
 

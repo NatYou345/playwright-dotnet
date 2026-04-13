@@ -620,6 +620,11 @@ public class BrowserTypeConnectTests : PlaywrightTestEx
 
         internal RemoteServer(string browserName)
         {
+            var allowedBrowserNames = new HashSet<string> { "chromium", "firefox", "webkit" };
+            if (!allowedBrowserNames.Contains(browserName))
+            {
+                throw new ArgumentException($"Invalid browser name: {browserName}", nameof(browserName));
+            }
             try
             {
                 var (executablePath, getArgs) = Driver.GetExecutablePath();
