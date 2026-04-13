@@ -72,6 +72,10 @@ internal static class Driver
         var driverSearchPath = Environment.GetEnvironmentVariable("PLAYWRIGHT_DRIVER_SEARCH_PATH");
         if (!string.IsNullOrEmpty(driverSearchPath))
         {
+            if (!Path.IsPathRooted(driverSearchPath))
+            {
+                throw new PlaywrightException("PLAYWRIGHT_DRIVER_SEARCH_PATH must be an absolute path");
+            }
             (executableFile, getArgs) = GetPath(driverSearchPath);
             if (!File.Exists(executableFile))
             {
@@ -136,13 +140,18 @@ internal static class Driver
             throw new PlaywrightException("Unknown platform");
         }
 
-        var cliEntrypoint = Path.Combine(driversPath, ".playwright", "package", "cli.js");
+        var cliEntrypoint = Path.GetFullPath(Path.Combine(driversPath, ".playwright", "package", "cli.js"));
         string getArgs(string? args)
         {
             return !string.IsNullOrEmpty(args) ? $"\"{cliEntrypoint}\" {args}" : cliEntrypoint;
         }
+        var nodejsPath = Environment.GetEnvironmentVariable("PLAYWRIGHT_NODEJS_PATH");
+        if (!string.IsNullOrEmpty(nodejsPath) && !Path.IsPathRooted(nodejsPath))
+        {
+            throw new PlaywrightException("PLAYWRIGHT_NODEJS_PATH must be an absolute path");
+        }
         return (
-            Environment.GetEnvironmentVariable("PLAYWRIGHT_NODEJS_PATH") ?? Path.GetFullPath(Path.Combine(driversPath, ".playwright", "node", platformId, nodeExecutable)),
+            nodejsPath ?? Path.GetFullPath(Path.Combine(driversPath, ".playwright", "node", platformId, nodeExecutable)),
             getArgs);
     }
 }

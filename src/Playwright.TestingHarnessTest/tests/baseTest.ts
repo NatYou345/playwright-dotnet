@@ -161,7 +161,7 @@ class ProxyServer {
   }
 
   handler(req: http.IncomingMessage, res: http.ServerResponse) {
-    if (req.url.includes('google.com')) // Telemetry requests.
+    if (req.url && new URL(req.url, 'http://localhost').hostname === 'google.com') // Telemetry requests.
       return;
     if (!req.headers['proxy-authorization']) {
       res.writeHead(407, { 'Proxy-Authenticate': 'Basic realm="Access to internal site"' });

@@ -46,6 +46,7 @@ public class SimpleServer
     private readonly IDictionary<string, string> _csp;
     private readonly IList<string> _gzipRoutes;
     private readonly string _contentRoot;
+    private readonly string _contentRootFull;
 
     private ArraySegment<byte> _onWebSocketConnectionData;
     private readonly IWebHost _webHost;
@@ -76,6 +77,7 @@ public class SimpleServer
         _csp = new ConcurrentDictionary<string, string>();
         _gzipRoutes = new List<string>();
         _contentRoot = contentRoot;
+        _contentRootFull = Path.GetFullPath(contentRoot) + Path.DirectorySeparatorChar;
 
         _webHost = new WebHostBuilder()
             .ConfigureLogging(logging =>
@@ -168,7 +170,15 @@ public class SimpleServer
     {
         var pathName = context.Request.Path.ToString();
         var fileName = string.IsNullOrEmpty(pathName) ? "index.html" : pathName.Substring(1);
-        var filePath = Path.Combine(_contentRoot, fileName);
+        var filePath = Path.GetFullPath(Path.Combine(_contentRoot, fileName));
+
+        if (!filePath.StartsWith(_contentRootFull, StringComparison.Ordinal))
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "text/plain";
+            await context.Response.WriteAsync("Bad request").ConfigureAwait(false);
+            return;
+        }
 
         context.Response.Headers["Cache-Control"] = "no-cache, no-store";
 

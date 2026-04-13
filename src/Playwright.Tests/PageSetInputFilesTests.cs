@@ -390,7 +390,7 @@ public class PageSetInputFilesTests : PageTestEx
     {
         var filesCount = 10;
         await Page.GotoAsync(Server.Prefix + "/input/fileupload-multi.html");
-        var uploadFile = Path.Combine(Path.GetTempPath(), "50MB_1.zip");
+        var uploadFile = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "50MB_1.zip"));
         using (var stream = File.OpenWrite(uploadFile))
         {
             var str = new string('A', 1024);
