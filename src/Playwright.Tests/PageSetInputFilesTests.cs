@@ -419,7 +419,7 @@ public class PageSetInputFilesTests : PageTestEx
         Assert.AreEqual(filesCount, filesLen);
         foreach (var file in uploadFiles)
         {
-            File.Delete(Path.GetFullPath(file));
+            File.Delete(file);
         }
     }
 
